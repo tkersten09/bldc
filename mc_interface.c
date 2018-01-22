@@ -1316,20 +1316,19 @@ static void update_override_limits(volatile mc_configuration *conf) {
 		lo_max_mos = 0.0;
 		mc_interface_fault_stop(FAULT_CODE_OVER_TEMP_FET);
 	} else {
+
+		// old code behaved unintended,i.e. if negative current limit is at -50, positive limit is at 100,
+		// temp limits are 80/100 degrees and current motor temp is at 82. In this case, the positive limit
+		// will be correctly set to 90, but negative limit will be kept at 0 instead of -45 (10% reduction).
+
 		float maxc = fabsf(conf->l_current_max);
-		if (fabsf(conf->l_current_min) > maxc) {
-			maxc = fabsf(conf->l_current_min);
-		}
+		float minc = fabsf(conf->l_current_min);
 
 		maxc = utils_map(m_temp_fet, conf->l_temp_fet_start, conf->l_temp_fet_end, maxc, 0.0);
+		minc = utils_map(m_temp_fet, conf->l_temp_fet_start, conf->l_temp_fet_end, minc, 0.0);
 
-		if (fabsf(conf->l_current_max) > maxc) {
-			lo_max_mos = SIGN(conf->l_current_max) * maxc;
-		}
-
-		if (fabsf(conf->l_current_min) > maxc) {
-			lo_min_mos = SIGN(conf->l_current_min) * maxc;
-		}
+		lo_max_mos = SIGN(conf->l_current_max) * maxc;
+		lo_min_mos = SIGN(conf->l_current_min) * minc;
 	}
 
 	// Temperature MOTOR
@@ -1343,20 +1342,21 @@ static void update_override_limits(volatile mc_configuration *conf) {
 		lo_max_mot = 0.0;
 		mc_interface_fault_stop(FAULT_CODE_OVER_TEMP_MOTOR);
 	} else {
+
+		// old code behaved unintended,i.e. if negative current limit is at -50, positive limit is at 100,
+		// temp limits are 80/100 degrees and current motor temp is at 82. In this case, the positive limit
+		// will be correctly set to 90, but negative limit will be kept at 0 instead of -45 (10% reduction).
+
 		float maxc = fabsf(conf->l_current_max);
-		if (fabsf(conf->l_current_min) > maxc) {
-			maxc = fabsf(conf->l_current_min);
-		}
+		float minc = fabsf(conf->l_current_min);
 
 		maxc = utils_map(m_temp_motor, conf->l_temp_motor_start, conf->l_temp_motor_end, maxc, 0.0);
+		minc = utils_map(m_temp_motor, conf->l_temp_motor_start, conf->l_temp_motor_end, minc, 0.0);
 
-		if (fabsf(conf->l_current_max) > maxc) {
-			lo_max_mot = SIGN(conf->l_current_max) * maxc;
-		}
+		lo_max_mot = SIGN(conf->l_current_max) * maxc;
+		lo_min_mot = SIGN(conf->l_current_min) * minc;
 
-		if (fabsf(conf->l_current_min) > maxc) {
-			lo_min_mot = SIGN(conf->l_current_min) * maxc;
-		}
+
 	}
 
 	// Decreased temperatures during acceleration
