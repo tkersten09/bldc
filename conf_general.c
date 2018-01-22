@@ -131,6 +131,33 @@ void conf_general_get_default_app_configuration(app_configuration *conf) {
 	conf->app_adc_conf.tc_max_diff = APPCONF_ADC_TC_MAX_DIFF;
 	conf->app_adc_conf.update_rate_hz = APPCONF_ADC_UPDATE_RATE_HZ;
 
+	conf->app_adc_boost_conf.ctrl_type = APPCONF_ADC_CTRL_TYPE;
+	conf->app_adc_boost_conf.hyst = APPCONF_ADC_HYST;
+	conf->app_adc_boost_conf.voltage_start = APPCONF_ADC_VOLTAGE_START;
+	conf->app_adc_boost_conf.voltage_end = APPCONF_ADC_VOLTAGE_END;
+	conf->app_adc_boost_conf.voltage_center = APPCONF_ADC_VOLTAGE_CENTER;
+	conf->app_adc_boost_conf.voltage2_start = APPCONF_ADC_VOLTAGE2_START;
+	conf->app_adc_boost_conf.voltage2_end = APPCONF_ADC_VOLTAGE2_END;
+	conf->app_adc_boost_conf.use_filter = APPCONF_ADC_USE_FILTER;
+	conf->app_adc_boost_conf.safe_start = APPCONF_ADC_SAFE_START;
+	conf->app_adc_boost_conf.cc_button_inverted = APPCONF_ADC_CC_BUTTON_INVERTED;
+	conf->app_adc_boost_conf.rev_button_inverted = APPCONF_ADC_REV_BUTTON_INVERTED;
+	conf->app_adc_boost_conf.voltage_inverted = APPCONF_ADC_VOLTAGE_INVERTED;
+	conf->app_adc_boost_conf.voltage2_inverted = APPCONF_ADC_VOLTAGE2_INVERTED;
+	conf->app_adc_boost_conf.throttle_exp = APPCONF_ADC_THROTTLE_EXP;
+	conf->app_adc_boost_conf.throttle_exp_brake = APPCONF_ADC_THROTTLE_EXP_BRAKE;
+	conf->app_adc_boost_conf.throttle_exp_mode = APPCONF_ADC_THROTTLE_EXP_MODE;
+	conf->app_adc_boost_conf.ramp_time_pos = APPCONF_ADC_RAMP_TIME_POS;
+	conf->app_adc_boost_conf.ramp_time_neg = APPCONF_ADC_RAMP_TIME_NEG;
+	conf->app_adc_boost_conf.multi_esc = APPCONF_ADC_MULTI_ESC;
+	conf->app_adc_boost_conf.tc = APPCONF_ADC_TC;
+	conf->app_adc_boost_conf.tc_max_diff = APPCONF_ADC_TC_MAX_DIFF;
+	conf->app_adc_boost_conf.update_rate_hz = APPCONF_ADC_UPDATE_RATE_HZ;
+	conf->app_adc_boost_conf.boost_start = APPCONF_ADC_BOOST_BOOST_START;
+	conf->app_adc_boost_conf.max_boost_time = APPCONF_ADC_BOOST_MAX_BOOST_TIME;
+	conf->app_adc_boost_conf.boost_cooldown_factor = APPCONF_ADC_BOOST_BOOST_COOLDOWN_FACTOR;
+
+
 	conf->app_uart_baudrate = APPCONF_UART_BAUDRATE;
 
 	conf->app_chuk_conf.ctrl_type = APPCONF_CHUK_CTRL_TYPE;

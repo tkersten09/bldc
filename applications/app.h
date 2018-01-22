@@ -40,6 +40,14 @@ float app_adc_get_voltage(void);
 float app_adc_get_decoded_level2(void);
 float app_adc_get_voltage2(void);
 
+void app_adc_boost_start(bool use_rx_tx);
+void app_adc_boost_stop(void);
+void app_adc_boost_configure(adc_boost_config *conf);
+float app_adc_boost_get_decoded_level(void);
+float app_adc_boost_get_voltage(void);
+float app_adc_boost_get_decoded_level2(void);
+float app_adc_boost_get_voltage2(void);
+
 void app_uartcomm_start(void);
 void app_uartcomm_stop(void);
 void app_uartcomm_configure(uint32_t baudrate);
@@ -54,5 +62,7 @@ void app_nunchuk_update_output(chuck_data *data);
 void app_custom_start(void);
 void app_custom_stop(void);
 void app_custom_configure(app_configuration *conf);
+
+void app_example_init(void); // Your application
 
 #endif /* APP_H_ */
