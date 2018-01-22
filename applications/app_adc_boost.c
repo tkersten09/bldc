@@ -283,7 +283,7 @@ static THD_FUNCTION(adc_thread, arg) {
 		//this lets the user determine a long time and a short time current limit
 		static float boost_meter = 0;
 		static bool  boost_enabled  = true;
-
+		//test
 		//if we are currently in overdrive, increase boost_meter ( acts as a motor temperature simulation)
 		if (fabsf(pwr) > config.boost_start && boost_enabled == true) {
 			boost_meter += pwr - config.boost_start;
