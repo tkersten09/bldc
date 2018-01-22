@@ -361,6 +361,10 @@ void commands_process_packet(unsigned char *data, unsigned int len) {
 		mcconf.m_dc_f_sw = buffer_get_float32_auto(data, &ind);
 		mcconf.m_ntc_motor_beta = buffer_get_float32_auto(data, &ind);
 
+		mcconf.l_boost_current = buffer_get_float32_auto(data, &ind);
+		mcconf.max_boost_time = buffer_get_float32_auto(data, &ind);
+		mcconf.boost_cooldown_time = buffer_get_float32_auto(data, &ind);
+
 		// Apply limits if they are defined
 #ifndef DISABLE_HW_LIMITS
 #ifdef HW_LIM_CURRENT

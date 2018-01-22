@@ -43,7 +43,6 @@ void app_set_configuration(app_configuration *conf) {
 
 	app_ppm_stop();
 	app_adc_stop();
-	app_adc_boost_stop();
 	app_uartcomm_stop();
 	app_nunchuk_stop();
 
@@ -66,10 +65,6 @@ void app_set_configuration(app_configuration *conf) {
 
 	case APP_ADC:
 		app_adc_start(true);
-		break;
-
-	case APP_ADC_BOOST:
-		app_adc_boost_start(true);
 		break;
 
 	case APP_UART:

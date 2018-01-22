@@ -164,6 +164,11 @@ typedef struct {
 	float l_max_duty;
 	float l_watt_max;
 	float l_watt_min;
+	//boost limits
+	bool boost_enabled;
+	float l_boost_current;
+	float max_boost_time;
+	float boost_cooldown_time;
 	// Overridden limits (Computed during runtime)
 	float lo_current_max;
 	float lo_current_min;
@@ -171,6 +176,7 @@ typedef struct {
 	float lo_in_current_min;
 	float lo_current_motor_max_now;
 	float lo_current_motor_min_now;
+
 	// Sensorless (bldc)
 	float sl_min_erpm;
 	float sl_min_erpm_cycle_int_limit;
@@ -241,6 +247,7 @@ typedef struct {
 	float m_bldc_f_sw_max;
 	float m_dc_f_sw;
 	float m_ntc_motor_beta;
+
 } mc_configuration;
 
 // Applications to use
@@ -254,7 +261,6 @@ typedef enum {
 	APP_NUNCHUK,
 	APP_NRF,
 	APP_CUSTOM,
-	APP_ADC_BOOST
 } app_use;
 
 // Throttle curve mode
@@ -337,34 +343,6 @@ typedef struct {
 	float tc_max_diff;
 	uint32_t update_rate_hz;
 } adc_config;
-
-typedef struct {
-	adc_control_type ctrl_type;
-	float hyst;
-	float voltage_start;
-	float voltage_end;
-	float voltage_center;
-	float voltage2_start;
-	float voltage2_end;
-	bool use_filter;
-	bool safe_start;
-	bool cc_button_inverted;
-	bool rev_button_inverted;
-	bool voltage_inverted;
-	bool voltage2_inverted;
-	float throttle_exp;
-	float throttle_exp_brake;
-	thr_exp_mode throttle_exp_mode;
-	float ramp_time_pos;
-	float ramp_time_neg;
-	bool multi_esc;
-	bool tc;
-	float tc_max_diff;
-	uint32_t update_rate_hz;
-	float boost_start;
-	float max_boost_time;
-	float boost_cooldown_factor;
-} adc_boost_config;
 
 // Nunchuk control types
 typedef enum {
@@ -460,9 +438,6 @@ typedef struct {
 
 	// ADC application settings
 	adc_config app_adc_conf;
-
-	//ADC boost application settings
-	adc_boost_config app_adc_boost_conf;
 
 	// UART application settings
 	uint32_t app_uart_baudrate;

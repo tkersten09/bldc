@@ -40,14 +40,6 @@ float app_adc_get_voltage(void);
 float app_adc_get_decoded_level2(void);
 float app_adc_get_voltage2(void);
 
-void app_adc_boost_start(bool use_rx_tx);
-void app_adc_boost_stop(void);
-void app_adc_boost_configure(adc_boost_config *conf);
-float app_adc_boost_get_decoded_level(void);
-float app_adc_boost_get_voltage(void);
-float app_adc_boost_get_decoded_level2(void);
-float app_adc_boost_get_voltage2(void);
-
 void app_uartcomm_start(void);
 void app_uartcomm_stop(void);
 void app_uartcomm_configure(uint32_t baudrate);

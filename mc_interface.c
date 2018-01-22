@@ -1343,21 +1343,8 @@ static void update_override_limits(volatile mc_configuration *conf) {
 		lo_max_mot = 0.0;
 		mc_interface_fault_stop(FAULT_CODE_OVER_TEMP_MOTOR);
 	} else {
-//		float maxc = fabsf(conf->l_current_max);
-//		if (fabsf(conf->l_current_min) > maxc) {
-//			maxc = fabsf(conf->l_current_min);
-//		}
-//
-//		maxc = utils_map(m_temp_motor, conf->l_temp_motor_start, conf->l_temp_motor_end, maxc, 0.0);
-//
-//		if (fabsf(conf->l_current_max) > maxc) {
-//			lo_max_mot = SIGN(conf->l_current_max) * maxc;
-//		}
-//
-//		if (fabsf(conf->l_current_min) > maxc) {
-//			lo_min_mot = SIGN(conf->l_current_min) * maxc;
-//		}
-		// old code: this behaves unintended,i.e. if negative current limit is at -50, positive limit is at 100,
+
+		// old code behaved unintended,i.e. if negative current limit is at -50, positive limit is at 100,
 		// temp limits are 80/100 degrees and current motor temp is at 82. In this case, the positive limit will be correctly set
 		// to 90, but negative limit will be kept at 0 instead of -45 (10% reduction).
 
@@ -1370,9 +1357,9 @@ static void update_override_limits(volatile mc_configuration *conf) {
 		lo_max_mot = SIGN(conf->l_current_max) * maxc;
 		lo_min_mot = SIGN(conf->l_current_min) * minc;
 
-//
 
 	}
+
 
 	// Decreased temperatures during acceleration
 	// in order to still have braking torque available
@@ -1440,6 +1427,48 @@ static void update_override_limits(volatile mc_configuration *conf) {
 	if (lo_min > -conf->cc_min_current) {
 		lo_min = -conf->cc_min_current;
 	}
+
+
+	//Boost current: allows for a user defined short term increase of the current limit.
+	//internally, the motor temperature is simulated by a simple linear model with a
+	//constant cooldown and the current is reduced back to the default
+	//limit for a set cooldown time when the simulated temperature reaches a threshold.
+
+	// boost_meter is between 0 and 1, when it reaches 1, the boost current will be disabled .
+	static float boost_meter = 0;
+	static bool  boost_enabled  = true;
+
+	float current_now= mc_interface_get_tot_current_filtered();
+
+	float max_over_current = utils_max_abs(conf->l_boost_current - conf->l_current_max,0.0);
+
+	if (boost_enabled == true && current_now > conf->l_current_max ) {
+		//thread is called with 1khz
+		boost_meter += (current_now - conf->l_current_max)/(max_over_current *1000.0 *conf->max_boost_time);
+
+	} else if (current_now <= conf->l_current_max && boost_meter > 0.0){
+
+		//reduce boost meter at a constant rate
+		boost_meter -= 1.0/(conf->boost_cooldown_time*1000.0);
+	}
+
+	if (boost_meter > 1.0 ) {
+		boost_enabled = false;
+	}
+
+	if (boost_meter < 0.0){
+		boost_meter = 0;
+		boost_enabled = true;
+	}
+
+
+
+	//if no temperature limit sets in, allow  additional boost current
+	if (conf->l_current_max == lo_max && boost_enabled) {
+		lo_max = conf->l_boost_current;
+	}
+
+
 
 	conf->lo_current_max = lo_max;
 	conf->lo_current_min = lo_min;

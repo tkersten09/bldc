@@ -353,4 +353,18 @@
 #define MCCONF_M_NTC_MOTOR_BETA			3380.0 // Beta value for motor termistor
 #endif
 
+//Boost Settings
+#ifndef MCCONF_BOOST_ENABLED
+#define MCCONF_BOOST_ENABLED			true // Enable Motor Boost current.
+#endif
+#ifndef MCCONF_L_BOOST_CURRENT
+#define MCCONF_L_BOOST_CURRENT			80.0 // Maximum time in seconds for the additional boost current
+#endif
+#ifndef MCCONF_MAX_BOOST_TIME
+#define MCCONF_MAX_BOOST_TIME			15.0 // Maximum time in seconds for the additional boost current
+#endif
+#ifndef MCCONF_BOOST_COOLDOWN_TIME
+#define MCCONF_BOOST_COOLDOWN_TIME		60.0 // Maximum time in seconds for the additional boost current
+#endif
+
 #endif /* MCCONF_DEFAULT_H_ */
