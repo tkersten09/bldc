@@ -169,6 +169,8 @@ typedef struct {
 	float l_boost_current;
 	float max_boost_time;
 	float boost_cooldown_time;
+	// Soft Duty Cycle limit
+	float l_duty_start;
 	// Overridden limits (Computed during runtime)
 	float lo_current_max;
 	float lo_current_min;

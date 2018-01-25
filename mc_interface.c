@@ -1386,6 +1386,19 @@ static void update_override_limits(volatile mc_configuration *conf) {
 				temp_motor_accel_end, conf->l_current_max, 0.0);
 	}
 
+	//Soft Duty Cycle limit
+	float lo_duty_limit = 0.0;
+	const float duty_cut_start = conf->l_max_duty * conf->l_duty_start;
+	const float duty_cut_end = conf->l_max_duty;
+	float duty_now = fabs(mc_interface_get_duty_cycle_now());
+	if (duty_now < duty_cut_start) {
+		lo_duty_limit = conf->l_current_max;
+	} else if (duty_now > duty_cut_end) {
+		lo_duty_limit = 0.0;
+	} else {
+		lo_duty_limit = utils_map(duty_now, duty_cut_start, duty_cut_end, conf->l_current_max, 0.0);
+	}
+
 	// RPM max
 	float lo_max_rpm = 0.0;
 	const float rpm_pos_cut_start = conf->l_max_erpm * conf->l_erpm_start;
@@ -1413,6 +1426,7 @@ static void update_override_limits(volatile mc_configuration *conf) {
 	float lo_max = utils_min_abs(lo_max_mos, lo_max_mot);
 	float lo_min = utils_min_abs(lo_min_mos, lo_min_mot);
 
+	lo_max = utils_min_abs(lo_max, lo_duty_limit);
 	lo_max = utils_min_abs(lo_max, lo_max_rpm);
 	lo_max = utils_min_abs(lo_max, lo_min_rpm);
 	lo_max = utils_min_abs(lo_max, lo_fet_temp_accel);

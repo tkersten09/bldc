@@ -366,6 +366,9 @@ void commands_process_packet(unsigned char *data, unsigned int len) {
 		mcconf.l_boost_current = buffer_get_float32_auto(data, &ind);
 		mcconf.max_boost_time = buffer_get_float32_auto(data, &ind);
 		mcconf.boost_cooldown_time = buffer_get_float32_auto(data, &ind);
+		
+		// Soft Duty Cycle limit
+		mcconf.l_duty_start = buffer_get_float32_auto(data, &ind);
 
 		// Apply limits if they are defined
 #ifndef DISABLE_HW_LIMITS
@@ -527,6 +530,9 @@ void commands_process_packet(unsigned char *data, unsigned int len) {
 		buffer_append_float32_auto(send_buffer, mcconf.l_boost_current, &ind);
 		buffer_append_float32_auto(send_buffer, mcconf.max_boost_time, &ind);
 		buffer_append_float32_auto(send_buffer, mcconf.boost_cooldown_time, &ind);
+		
+		// Soft Duty Cycle limit
+		buffer_append_float32_auto(send_buffer, mcconf.l_duty_start, &ind);
 
 		commands_send_packet(send_buffer, ind);
 		break;

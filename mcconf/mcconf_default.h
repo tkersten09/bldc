@@ -367,4 +367,9 @@
 #define MCCONF_BOOST_COOLDOWN_TIME		90.0 // Maximum time in seconds for the additional boost current
 #endif
 
+// Soft Duty Cycle limit
+#ifndef MCCONF_L_DUTY_CYCLE_START
+#define MCCONF_L_DUTY_CYCLE_START		0.90 // start to limit current at this relative value of the Max duty cycle
+#endif
+
 #endif /* MCCONF_DEFAULT_H_ */

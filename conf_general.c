@@ -291,6 +291,9 @@ void conf_general_get_default_mc_configuration(mc_configuration *conf) {
 	conf->l_boost_current = MCCONF_L_BOOST_CURRENT;
 	conf->max_boost_time = MCCONF_MAX_BOOST_TIME;
 	conf->boost_cooldown_time = MCCONF_BOOST_COOLDOWN_TIME;
+
+	// Soft Duty Cycle limit
+	conf->l_duty_start = MCCONF_L_DUTY_CYCLE_START;
 }
 
 /**
