@@ -1426,6 +1426,49 @@ static void update_override_limits(volatile mc_configuration *conf) {
 		lo_min = -conf->cc_min_current;
 	}
 
+	// Boost mod
+	//Boost current: allows for a user defined short term increase of the current limit.
+	//internally, the motor temperature is simulated by a simple linear model with a
+	//constant cooldown and the current is reduced back to the default
+	//limit for a set cooldown time when the simulated temperature reaches a threshold.
+
+	// boost_meter is between 0 and 1, when it reaches 1, the boost current will be disabled .
+	if(conf->boost_enabled) {
+		static float boost_meter = 0;
+		static bool  boost_cooldown  = false;
+
+		float current_now= mc_interface_get_tot_current_filtered();
+
+		float max_over_current = utils_max_abs(conf->l_boost_current - conf->l_current_max,0.0);
+
+		if (boost_cooldown == false && current_now > conf->l_current_max ) {
+			//thread is called with 1khz
+			boost_meter += (current_now - conf->l_current_max)/(max_over_current *1000.0 *conf->max_boost_time);
+
+		} else if (current_now <= conf->l_current_max && boost_meter > 0.0){
+
+			//reduce boost meter at a constant rate when not drawing too much current
+			boost_meter -= 1.0/(conf->boost_cooldown_time*1000.0);
+		}
+
+		if (boost_meter > 1.0 ) { //if boost current was requested for too long, force cooldown.
+			boost_cooldown = true;
+		}
+
+		if (boost_meter < 0.0){
+			boost_meter = 0;
+			boost_cooldown = false;
+		}
+
+
+
+		//if no other limit engages, allow additional boost current
+		if (conf->l_current_max == lo_max && boost_cooldown == false) {
+			lo_max = conf->l_boost_current;
+		}
+
+	}
+
 	conf->lo_current_max = lo_max;
 	conf->lo_current_min = lo_min;
 

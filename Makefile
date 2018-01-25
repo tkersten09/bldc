@@ -90,7 +90,7 @@ endif
 #
 
 # Define project name here
-PROJECT = BLDC_4_ChibiOS
+PROJECT = VESC_Boost_V1.0.0
 
 # Imported source files and paths
 CHIBIOS = ChibiOS_3.0.2

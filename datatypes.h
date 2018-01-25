@@ -164,6 +164,11 @@ typedef struct {
 	float l_max_duty;
 	float l_watt_max;
 	float l_watt_min;
+	// Boost Settings
+	bool boost_enabled;
+	float l_boost_current;
+	float max_boost_time;
+	float boost_cooldown_time;
 	// Overridden limits (Computed during runtime)
 	float lo_current_max;
 	float lo_current_min;
@@ -241,6 +246,7 @@ typedef struct {
 	float m_bldc_f_sw_max;
 	float m_dc_f_sw;
 	float m_ntc_motor_beta;
+
 } mc_configuration;
 
 // Applications to use
@@ -253,7 +259,7 @@ typedef enum {
 	APP_ADC_UART,
 	APP_NUNCHUK,
 	APP_NRF,
-	APP_CUSTOM
+	APP_CUSTOM,
 } app_use;
 
 // Throttle curve mode
