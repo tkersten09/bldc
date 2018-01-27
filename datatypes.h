@@ -343,6 +343,11 @@ typedef struct {
 	bool tc;
 	float tc_max_diff;
 	uint32_t update_rate_hz;
+	// No-Button Cruise Control
+	bool nb_cc_enabled;
+	float nb_cc_time_window;
+	float nb_cc_input_tolerance;
+	float nb_cc_rpm_tolerance;
 } adc_config;
 
 // Nunchuk control types

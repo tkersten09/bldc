@@ -614,6 +614,12 @@ void commands_process_packet(unsigned char *data, unsigned int len) {
 		ind += 3;
 		appconf.app_nrf_conf.send_crc_ack = data[ind++];
 
+		// No-Button Cruise Control
+		appconf.app_adc_conf.nb_cc_enabled = data[ind++];
+		appconf.app_adc_conf.nb_cc_time_window = buffer_get_float32_auto(data, &ind);
+		appconf.app_adc_conf.nb_cc_input_tolerance = buffer_get_float32_auto(data, &ind);
+		appconf.app_adc_conf.nb_cc_rpm_tolerance = buffer_get_float32_auto(data, &ind);
+
 		conf_general_store_app_configuration(&appconf);
 		app_set_configuration(&appconf);
 		timeout_configure(appconf.timeout_msec, appconf.timeout_brake_current);
@@ -1012,6 +1018,12 @@ void commands_send_appconf(COMM_PACKET_ID packet_id, app_configuration *appconf)
 	memcpy(send_buffer + ind, appconf->app_nrf_conf.address, 3);
 	ind += 3;
 	send_buffer[ind++] = appconf->app_nrf_conf.send_crc_ack;
+
+	// No-Button Cruise Control
+	send_buffer[ind++] = appconf->app_adc_conf.nb_cc_enabled;
+	buffer_append_float32_auto(send_buffer, appconf->app_adc_conf.nb_cc_time_window, &ind);
+	buffer_append_float32_auto(send_buffer, appconf->app_adc_conf.nb_cc_input_tolerance, &ind);
+	buffer_append_float32_auto(send_buffer, appconf->app_adc_conf.nb_cc_rpm_tolerance, &ind);
 
 	commands_send_packet(send_buffer, ind);
 }

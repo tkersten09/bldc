@@ -204,6 +204,20 @@
 #define APPCONF_CHUK_TC_MAX_DIFF			3000.0
 #endif
 
+// No-Button Cruise Control
+#ifndef APPCONF_ADC_NB_CC_ENABLED
+#define APPCONF_ADC_NB_CC_ENABLED               false
+#endif
+#ifndef APPCONF_ADC_NB_CC_TIME_WINDOW
+#define APPCONF_ADC_NB_CC_TIME_WINDOW           2.0
+#endif
+#ifndef APPCONF_ADC_NB_CC_INPUT_TOLERANCE
+#define APPCONF_ADC_NB_CC_INPUT_TOLERANCE       0.05
+#endif
+#ifndef APPCONF_ADC_NB_CC_RPM_TOLERANCE
+#define APPCONF_ADC_NB_CC_RPM_TOLERANCE         0.05
+#endif
+
 // NRF app
 #ifndef APPCONF_NRF_SPEED
 #define APPCONF_NRF_SPEED					NRF_SPEED_2M

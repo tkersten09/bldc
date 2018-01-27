@@ -155,6 +155,12 @@ void conf_general_get_default_app_configuration(app_configuration *conf) {
 	conf->app_nrf_conf.address[1] = APPCONF_NRF_ADDR_B1;
 	conf->app_nrf_conf.address[2] = APPCONF_NRF_ADDR_B2;
 	conf->app_nrf_conf.send_crc_ack = APPCONF_NRF_SEND_CRC_ACK;
+
+	// No-Button Cruise Control
+	conf->app_adc_conf.nb_cc_enabled = APPCONF_ADC_NB_CC_ENABLED;
+	conf->app_adc_conf.nb_cc_time_window = APPCONF_ADC_NB_CC_TIME_WINDOW;
+	conf->app_adc_conf.nb_cc_input_tolerance = APPCONF_ADC_NB_CC_INPUT_TOLERANCE;
+	conf->app_adc_conf.nb_cc_rpm_tolerance = APPCONF_ADC_NB_CC_RPM_TOLERANCE;
 }
 
 /**

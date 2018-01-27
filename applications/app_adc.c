@@ -34,6 +34,7 @@
 #define MIN_MS_WITHOUT_POWER			500
 #define FILTER_SAMPLES					5
 #define RPM_FILTER_SAMPLES				8
+#define BUFFER_SAMPLES                  8
 
 // Threads
 static THD_FUNCTION(adc_thread, arg);
@@ -250,6 +251,7 @@ static THD_FUNCTION(adc_thread, arg) {
 		case ADC_CTRL_TYPE_DUTY_REV_CENTER:
 		case ADC_CTRL_TYPE_PID_REV_CENTER:
 			// Scale the voltage and set 0 at the center
+		    // for all control types listed above
 			pwr *= 2.0;
 			pwr -= 1.0;
 			break;
@@ -414,24 +416,120 @@ static THD_FUNCTION(adc_thread, arg) {
 		if (filter_ptr >= RPM_FILTER_SAMPLES) {
 			filter_ptr = 0;
 		}
-
 		float rpm_filtered = 0.0;
 		for (int i = 0;i < RPM_FILTER_SAMPLES;i++) {
 			rpm_filtered += filter_buffer[i];
 		}
 		rpm_filtered /= RPM_FILTER_SAMPLES;
 
+		// No-Button Cruise Control
+		// Init Settings
+		static bool nb_cc_enabled = false;
+		static float nb_cc_time_window = 2.0; //s
+		static float nb_cc_input_tolerance = 0.05; // multiplier of input range
+		static float nb_cc_rpm_tolerance = 0.05; // multiplier of the rpm
+
+		// Filter pwr to avoid glitches
+        static float pwr_filter_buffer[PWR_FILTER_SAMPLES];
+        static int pwr_filter_ptr = 0;
+        pwr_filter_buffer[pwr_filter_ptr++] = pwr;
+        if (pwr_filter_ptr >= PWR_FILTER_SAMPLES) {
+          pwr_filter_ptr = 0;
+        }
+        float pwr_filtered = 0.0;
+        for (int i = 0;i < PWR_FILTER_SAMPLES;i++) {
+          pwr_filtered += pwr_filter_buffer[i];
+        }
+        pwr_filtered /= PWR_FILTER_SAMPLES;
+
+        // Currently the no button Cruise Control
+        // only works when the input (pwr) is between 0 and 1
+        // and 0 means no output.
+		switch(config.ctrl_type) {
+		case ADC_CTRL_TYPE_CURRENT:
+            if(nb_cc_enabled) {
+              // store the last x rpm values in the given time window
+              static float rpm_filtered_buffer[BUFFER_SAMPLES];
+              static float pwr_filtered_buffer[BUFFER_SAMPLES];
+              static int buffer_ptr = 0;
+              static systime_t last_sample_time = 0;
+              const float time_between_samples = nb_cc_time_window * 1000/BUFFER_SAMPLES; //ms
+              if((float)ST2MS(chVTTimeElapsedSinceX(last_sample_time)) > time_between_samples)
+                {
+                last_sample_time = chVTGetSystemTimeX();
+                rpm_filtered_buffer[buffer_ptr++] = rpm_filtered;
+                pwr_filtered_buffer[buffer_ptr++] = pwr_filtered;
+                if (buffer_ptr >= BUFFER_SAMPLES) {
+                  buffer_ptr = 0;
+                }
+               }
+
+              // tracks when the input was hit 0 the last time
+              static systime_t last_time_zero = 0;
+              if(pwr_filtered < nb_cc_input_tolerance){
+                  last_time_zero = chVTGetSystemTimeX();
+                }
+
+              // tracks when the maximum input of 1 was hit the last time
+              static systime_t last_time_one = 0;
+              if( (1 - nb_cc_input_tolerance) <= pwr_filtered && pwr_filtered <= 1){
+                  last_time_one = chVTGetSystemTimeX();
+                }
+              // checks if cruise control should be engaged
+                cc_button = false;
+
+                // compare current and the oldest rpm value
+
+                // get the oldest rpm and pwr value from the buffer
+                float oldest_rpm_filtered = 0;
+                float oldest_pwr_filtered = 0;
+                int oldest_entry_ptr = (int)fmod(buffer_ptr+1, BUFFER_SAMPLES - 1);
+                oldest_rpm_filtered = rpm_filtered_buffer[oldest_entry_ptr];
+                oldest_pwr_filtered = pwr_filtered_buffer[oldest_entry_ptr];
+
+                // continues only if the current and the old rpm and pwr values are close
+                if( (oldest_rpm_filtered * (1 - nb_cc_rpm_tolerance)) <= rpm_filtered && rpm_filtered <= oldest_rpm_filtered* (1 + nb_cc_rpm_tolerance)) {
+                  if( (oldest_pwr_filtered * (1 - nb_cc_input_tolerance)) <= pwr_filtered && pwr_filtered <= oldest_pwr_filtered * (1 + nb_cc_input_tolerance)) {
+
+                  // get the elapsed time in ms since the Input power (pwr)
+                  // has hit the 0 and 1 value.
+                  static float zero_elapsed_since = 0;
+                  static float one_elapsed_since = 0;
+                  zero_elapsed_since = (float)ST2MS(chVTTimeElapsedSinceX(last_time_zero));
+                  one_elapsed_since = (float)ST2MS(chVTTimeElapsedSinceX(last_time_one));
+
+                  // checks if the pwr inputs has hit 0 and 1 within
+                  // the given time window
+                  if( zero_elapsed_since <= nb_cc_time_window && zero_elapsed_since <= nb_cc_time_window){
+
+                    // checks if the input pwr has hit 0 first and 1 after that.
+                    if(one_elapsed_since < zero_elapsed_since){
+
+                      // Engage the cruise control and maintain the current speed given in rpm
+                      mc_interface_set_pid_speed(rpm_filtered);
+                    }
+                  }
+                }
+              }
+              break;
+          default:
+            continue;
+          }
+		}
+
+		// Engage cruise control
 		if (current_mode && cc_button && fabsf(pwr) < 0.001) {
 			static float pid_rpm = 0.0;
 
 			if (!was_pid) {
 				was_pid = true;
 				pid_rpm = rpm_filtered;
+				mc_interface_set_pid_speed(pid_rpm);
 			}
 
-			mc_interface_set_pid_speed(pid_rpm);
 
-			// Send the same duty cycle to the other controllers
+
+			// Send the same current to the other controllers
 			if (config.multi_esc) {
 				float current = mc_interface_get_tot_current_directional_filtered();
 
