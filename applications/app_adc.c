@@ -35,6 +35,7 @@
 #define FILTER_SAMPLES					5
 #define RPM_FILTER_SAMPLES				8
 #define BUFFER_SAMPLES                  8
+#define PWR_FILTER_SAMPLES				8
 
 // Threads
 static THD_FUNCTION(adc_thread, arg);
@@ -524,9 +525,9 @@ static THD_FUNCTION(adc_thread, arg) {
 			if (!was_pid) {
 				was_pid = true;
 				pid_rpm = rpm_filtered;
-				mc_interface_set_pid_speed(pid_rpm);
-			}
 
+			}
+			mc_interface_set_pid_speed(pid_rpm);
 
 
 			// Send the same current to the other controllers
