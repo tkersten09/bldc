@@ -526,7 +526,8 @@ void commands_process_packet(unsigned char *data, unsigned int len) {
 		buffer_append_float32_auto(send_buffer, mcconf.m_ntc_motor_beta, &ind);
 		
 		// Boost Settings
-		buffer_append_float32_auto(send_buffer, mcconf.boost_enabled, &ind);
+		send_buffer[ind++] = mcconf.boost_enabled;
+		//buffer_append_float32_auto(send_buffer, mcconf.boost_enabled, &ind);
 		buffer_append_float32_auto(send_buffer, mcconf.l_boost_current, &ind);
 		buffer_append_float32_auto(send_buffer, mcconf.max_boost_time, &ind);
 		buffer_append_float32_auto(send_buffer, mcconf.boost_cooldown_time, &ind);
